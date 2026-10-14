@@ -1,0 +1,38 @@
+ACCESSIBILITY STRESS TEST — EXPECTED RESULTS
+
+UPLOAD SETTINGS
+- Turn ON heading detection and high-contrast correction.
+- Keep the all-tables-have-header-rows checkbox OFF. Some tables are layout tables.
+- Turn ON tagged PDF export if LibreOffice is installed.
+
+EXPECTED AUTOMATIC FIXES
+- Make supported editable text black on white, including white/invisible, gray, yellow, blue, highlighted, dark-background, table, header, footer and hyperlink text.
+- Remove highlight backgrounds and underline hyperlinks.
+- Add likely section heading styles and missing document title/default-language metadata.
+- Export Word, HTML text, and (if available) a tagged PDF.
+
+EXPECTED REPORT FINDINGS
+- Small directly formatted text (7, 8 and 9 points); the app flags rather than enlarges these.
+- Skipped heading levels (Heading 3 and Heading 4).
+- Two graphics without alt text.
+- Four tables without designated header rows; merged cells in two layout tables.
+- Vague click here/read more/here link labels.
+- Explicit light text colors below 4.5:1 against white.
+
+HUMAN REVIEW REQUIRED — NOT AUTOMATIC FIXES
+- Add accurate image descriptions using the supplied chart values.
+- Correct heading levels and designate headers for actual data tables individually. Simplify merged layout tables.
+- Enlarge small text. Replace vague link labels with meaningful destinations. Links point to example.com placeholders.
+- Replace color-only approval instructions with explicit status words; black/white conversion removes their visual distinction.
+- Replace position/shape-only instructions with explicit names.
+- Convert typed numbered paragraphs into a real Word list.
+- Mark the French passage as French and explain abbreviations.
+- Review every applicable WCAG criterion. Listing a criterion does not mean the app tested or passed it.
+
+EXPORT LIMITATIONS
+- HTML is a text export; it omits graphics, headers/footers, and hyperlink destinations.
+- A tagged PDF still needs validation and review of reading order, tables and alt text.
+- This is fictional test content. Do not treat the converted result as certified accessible.
+
+VERIFIED HERE
+The current app corrected editable text colors and retained both images and all four tables. Its report included the expected contrast, small-text, heading, alt-text, table and link findings. Microsoft Word rendering and its Accessibility Checker were not run.
