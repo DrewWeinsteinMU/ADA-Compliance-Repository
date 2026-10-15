@@ -16,6 +16,7 @@ from review import manifest, apply_review
 RESULTS = {}
 LOCK = threading.Lock()
 TTL = 1800
+APP_VERSION = 'guided-review-2'
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
@@ -37,6 +38,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = urlparse(self.path).path
+        if path == '/health':
+            return self.send(200,json.dumps({'status':'ok','version':APP_VERSION,'review_supported':True}).encode(),'application/json')
         if path == '/':
             return self.send(200, Path(__file__).with_name('templates').joinpath('index.html').read_bytes(), 'text/html; charset=utf-8')
         parts = path.strip('/').split('/')
@@ -84,7 +87,7 @@ class Handler(BaseHTTPRequestHandler):
                 with LOCK:
                     if len(RESULTS)>=20:del RESULTS[min(RESULTS,key=lambda k:RESULTS[k][0])]
                     RESULTS[new_token]=(time.time(),outputs)
-                return self.send(200,json.dumps({'token':new_token,'report':outputs['report'].decode(),'pdf_available':'pdf' in outputs}).encode(),'application/json')
+                return self.send(200,json.dumps({'token':new_token,'report':outputs['report'].decode(),'pdf_available':'pdf' in outputs,'review_supported':True,'version':APP_VERSION}).encode(),'application/json')
             ctype = self.headers.get('Content-Type', '')
             if not ctype.startswith('multipart/form-data') or '\r' in ctype or '\n' in ctype:
                 return self.error('Use the document upload form.')
@@ -105,7 +108,7 @@ class Handler(BaseHTTPRequestHandler):
                 if len(RESULTS) >= 20:
                     del RESULTS[min(RESULTS, key=lambda k: RESULTS[k][0])]
                 RESULTS[token] = (time.time(), outputs)
-            self.send(200, json.dumps({'token':token,'report':report,'pdf_available':'pdf' in outputs}).encode(), 'application/json')
+            self.send(200, json.dumps({'token':token,'report':report,'pdf_available':'pdf' in outputs,'review_supported':True,'version':APP_VERSION}).encode(), 'application/json')
         except ValueError as exc:
             self.error(str(exc))
         except Exception:

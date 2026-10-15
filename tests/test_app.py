@@ -31,7 +31,11 @@ class AppTests(unittest.TestCase):
         for content,name in [(buf.getvalue(),'employee.docx'),(pdf_sample(),'employee.pdf')]:
             with self.subTest(name=name):
                 result=json.load(self.upload(content,name))
+                self.assertTrue(result['review_supported'])
                 token=result['token']
+                review=json.load(urlopen(self.root+'/review/'+token))
+                self.assertIn('headings',review)
+                self.assertIn('images',review)
                 word=urlopen(self.root+'/download/'+token+'/document')
                 self.assertIn('Accessible_Document.docx',word.headers['Content-Disposition'])
                 self.assertTrue(Document(BytesIO(word.read())).paragraphs)
@@ -49,3 +53,17 @@ class AppTests(unittest.TestCase):
         with LOCK: RESULTS['expired']=(0,{})
         with self.assertRaises(HTTPError) as context: urlopen(self.root+'/download/expired/document')
         self.assertEqual(context.exception.code,404)
+
+class VersionTests(unittest.TestCase):
+    def test_review_capability_and_real_expiration(self):
+        server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+        thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+        root='http://127.0.0.1:'+str(server.server_port)
+        try:
+            health=json.load(urlopen(root+'/health'))
+            self.assertTrue(health['review_supported'])
+            self.assertTrue(health['version'])
+            with self.assertRaises(HTTPError) as context:urlopen(root+'/review/missing-token')
+            self.assertEqual(json.load(context.exception)['error'],'Review expired. Upload the document again.')
+        finally:
+            server.shutdown();server.server_close();thread.join()
