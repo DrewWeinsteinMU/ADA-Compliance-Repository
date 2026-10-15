@@ -65,15 +65,15 @@ def text_html(data):
             + ''.join(blocks) + '</main></body></html>').encode('utf-8')
 
 
-def process_document(data, filename, detect_headings=True, table_headers=False, export_pdf=False, high_contrast=True):
+def process_document(data, filename, detect_headings=True, table_headers=False, export_pdf=False, high_contrast=True, enlarge_text=True):
     if not data or len(data) > MAX_UPLOAD:
         raise ValueError('Choose a nonempty file smaller than 15 MB.')
     suffix = filename.lower().rsplit('.', 1)[-1]
     if suffix == 'docx':
-        word, report = convert(data, detect_headings, table_headers, high_contrast)
+        word, report = convert(data, detect_headings, table_headers, high_contrast, enlarge_text)
         report += '\n\nHTML TEXT EXPORT\nCompare the HTML against the source; images, advanced content, list numbering and link destinations are not exported.\n'
     elif suffix == 'pdf':
-        word, report = process_pdf(data, high_contrast)
+        word, report = process_pdf(data, high_contrast, enlarge_text)
     else:
         raise ValueError('Choose a .docx or .pdf file. Save older .doc files as .docx in Word first.')
     outputs = {'document': word, 'html': text_html(word)}
@@ -90,7 +90,7 @@ def process_document(data, filename, detect_headings=True, table_headers=False, 
     return outputs
 
 
-def process_pdf(data, high_contrast=True):
+def process_pdf(data, high_contrast=True, enlarge_text=True):
     if not data.startswith(b'%PDF-'):
         raise ValueError('This file does not appear to be a PDF.')
     try:
@@ -133,7 +133,7 @@ def process_pdf(data, high_contrast=True):
         if not total:
             raise ValueError('No extractable text was found. This may be a scanned PDF. Run OCR first, then upload the searchable PDF or a Word version.')
         source = BytesIO(); doc.save(source)
-        word, base_report = convert(source.getvalue(), False, False, high_contrast)
+        word, base_report = convert(source.getvalue(), False, False, high_contrast, enlarge_text)
         report = 'PDF ACCESSIBILITY SCAN\n\nThis automated scan does not certify ADA compliance.\n\nHUMAN REVIEW REQUIRED\n' + '\n'.join('- '+item for item in review) + '\n\nTEXT COPY REMEDIATION\n' + base_report
         return word, report
     except ValueError:

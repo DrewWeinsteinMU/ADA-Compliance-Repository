@@ -9,7 +9,7 @@ from docx.oxml.ns import qn
 MAX_UPLOAD = 15 * 1024 * 1024
 
 
-def convert(data, detect_headings=True, table_headers=False, high_contrast=True):
+def convert(data, detect_headings=True, table_headers=False, high_contrast=True, enlarge_text=True):
     if len(data) > MAX_UPLOAD:
         raise ValueError('Please upload a Word document smaller than 15 MB.')
     try:
@@ -116,6 +116,10 @@ def convert(data, detect_headings=True, table_headers=False, high_contrast=True)
         review.append('Text boxes are present. Check reading order and move essential text into the main document if needed.')
     if doc.element.xpath('.//w:ins | .//w:del'):
         review.append('Tracked changes are present. Review and resolve them before distributing the document.')
+    if enlarge_text:
+        from review import minimum_text
+        enlarged = minimum_text(doc)
+        changes.append(f'Raised {enlarged} directly formatted text runs below 12 points to 12 points. This is a readability preference, not a WCAG minimum font-size rule.')
     if high_contrast:
         from contrast import normalize_contrast
         contrast_changes, contrast_review = normalize_contrast(doc)

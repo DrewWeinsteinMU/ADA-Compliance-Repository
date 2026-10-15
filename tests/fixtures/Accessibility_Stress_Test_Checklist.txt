@@ -12,7 +12,7 @@ EXPECTED AUTOMATIC FIXES
 - Export Word, HTML text, and (if available) a tagged PDF.
 
 EXPECTED REPORT FINDINGS
-- Small directly formatted text (7, 8 and 9 points); the app flags rather than enlarges these.
+- Small source text (7, 8 and 9 points); with the new minimum-text option enabled the app raises supported text to 12 points and records the correction.
 - Skipped heading levels (Heading 3 and Heading 4).
 - Two graphics without alt text.
 - Four tables without designated header rows; merged cells in two layout tables.
@@ -36,3 +36,6 @@ EXPORT LIMITATIONS
 
 VERIFIED HERE
 The current app corrected editable text colors and retained both images and all four tables. Its report included the expected contrast, small-text, heading, alt-text, table and link findings. Microsoft Word rendering and its Accessibility Checker were not run.
+
+CURRENT GUIDED WORKFLOW
+After processing, choose Review and correct remaining issues. Supply chart alt text, confirm heading levels, designate headers for the two real data tables, and simplify layout tables only after reviewing the preview. Replace vague link wording using the destination. Apply corrections to regenerate downloads, then inspect the actual Word/PDF outputs.
